@@ -325,6 +325,19 @@
             transform: translateY(-5px);
         }
 
+        .social-links a:hover .boss-icon {
+            filter: brightness(1.3); /* 悬停时增加亮度 */
+        }
+
+        .boss-icon {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+            border-radius: 50%;
+            transition: var(--transition);
+            /* 去掉filter，使用原始图标颜色 */
+        }
+
         /* 履历 */
         .resume {
             background-color: var(--color-dark);
@@ -729,7 +742,7 @@
             </div>
             <div class="social-links">
                 <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                <a href="https://www.zhipin.com/" title="Boss直聘" target="_blank"><i class="fas fa-user-tie"></i></a>
+                <a href="https://m.zhipin.com/mpa/html/resume-detail?sid=self&securityId=OxSrj6zeuJEDF-414PDtkx8a8R5XlTYDPWUoBOWYTuym6XxbuxM-jiRK3Aop3jcaoYW9ArwcFzAmIu0qvY9XbIFghrXCevw4pI9AvJ-UDcTCPBhH7WmLpBWkHvVoZ80TWKYcUyB25pxQ5DOfY3b0n5BOndqpb5dlsaq5KrI~" title="Boss直聘" target="_blank" class="boss-link"><img src="boss-icon.png" alt="Boss直聘" class="boss-icon"></a>
                 <a href="javascript:void(0);" title="微信" id="wechatLink"><i class="fab fa-weixin"></i></a>
                <!-- <a href="#" title="知乎"><i class="fab fa-zhihu"></i></a>
                 <a href="#" title="ResearchGate"><i class="fab fa-researchgate"></i></a>-->
