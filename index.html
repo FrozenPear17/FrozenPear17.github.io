@@ -102,6 +102,30 @@
             background-color: rgba(255, 107, 53, 0.1);
         }
 
+        .lang-toggle {
+            background-color: transparent;
+            color: var(--color-text);
+            border: 2px solid var(--color-accent);
+            border-radius: var(--border-radius);
+            padding: 4px 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font-primary);
+            margin-left: 5px;
+            min-width: 45px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .lang-toggle:hover {
+            background-color: var(--color-accent);
+            color: var(--color-dark);
+        }
+
+
+
         .menu-toggle {
             display: none;
             font-size: 1.5rem;
@@ -209,22 +233,105 @@
             gap: 40px;
         }
 
-        .about-img {
+        .about-carousel {
             flex: 1;
             border-radius: var(--border-radius);
             overflow: hidden;
             box-shadow: var(--box-shadow);
+            position: relative;
         }
 
-        .about-img img {
+        .carousel-container {
+            position: relative;
             width: 100%;
-            height: auto;
-            display: block;
-            transition: var(--transition);
+            height: 0;
+            padding-bottom: 75%; /* 4:3 宽高比 */
+            overflow: hidden;
+            border-radius: var(--border-radius);
         }
 
-        .about-img img:hover {
-            transform: scale(1.05);
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--color-dark-gray);
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: var(--color-text);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 10;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-btn:hover {
+            background-color: rgba(255, 107, 53, 0.8);
+            color: var(--color-dark);
+        }
+
+        .carousel-btn.prev {
+            left: 10px;
+        }
+
+        .carousel-btn.next {
+            right: 10px;
+        }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .carousel-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0;
+        }
+
+        .carousel-indicator.active {
+            background-color: var(--color-accent);
+            transform: scale(1.2);
         }
 
         .about-text {
@@ -326,7 +433,7 @@
         }
 
         .social-links a:hover .boss-icon {
-            filter: brightness(1.3); /* 悬停时增加亮度 */
+            filter: brightness(0) invert(0.1); /* 悬停时变成深色 */
         }
 
         .boss-icon {
@@ -335,6 +442,7 @@
             object-fit: contain;
             border-radius: 50%;
             transition: var(--transition);
+            filter: brightness(0) invert(0.7); /* 变成灰色，与其他图标一致 */
         }
 
         /* 履历 */
@@ -532,6 +640,15 @@
                 margin: 15px 0;
             }
 
+            .lang-toggle {
+                margin-left: 0;
+                padding: 8px 12px;
+                font-size: 0.9rem;
+                min-width: 50px;
+            }
+
+
+
             .hero h1 {
                 font-size: 2.2rem;
             }
@@ -647,6 +764,30 @@
                 width: 200px;
                 height: 200px;
             }
+
+            /* 轮播在移动设备上的调整 */
+            .carousel-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            .carousel-btn.prev {
+                left: 5px;
+            }
+
+            .carousel-btn.next {
+                right: 5px;
+            }
+
+            .carousel-indicators {
+                bottom: 10px;
+            }
+
+            .carousel-indicator {
+                width: 8px;
+                height: 8px;
+            }
         }
     </style>
 </head>
@@ -662,9 +803,10 @@
                 <ul class="nav-links" id="navLinks">
                     <li><a href="#home">首页</a></li>
                     <li><a href="#about">关于我</a></li>
-                    <li><a href="#contact">联系</a></li>
                     <li><a href="#resume">履历</a></li>
                     <li><a href="#projects">项目</a></li>
+                    <li><a href="#contact">联系</a></li>
+                    <li><button id="langToggle" class="lang-toggle">EN</button></li>
                 </ul>
             </nav>
         </div>
@@ -684,8 +826,31 @@
         <div class="container">
             <h2 class="section-title">自我介绍</h2>
             <div class="about-content">
-                <div class="about-img">
-                    <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="工程师工作照">
+                <div class="about-carousel">
+                    <div class="carousel-container" id="aboutCarousel">
+                        <div class="carousel-slide active">
+                            <img src="MyPhoto1.jpg" alt="工程师工作照1">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="MyPhoto2.jpg" alt="工程师工作照2">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="MyPhoto3.jpg" alt="工程师工作照3">
+                        </div>
+
+                        <button class="carousel-btn prev" aria-label="上一张">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="carousel-btn next" aria-label="下一张">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+
+                        <div class="carousel-indicators">
+                            <button class="carousel-indicator active" data-index="0" aria-label="显示第一张照片"></button>
+                            <button class="carousel-indicator" data-index="1" aria-label="显示第二张照片"></button>
+                            <button class="carousel-indicator" data-index="2" aria-label="显示第三张照片"></button>
+                        </div>
+                    </div>
                 </div>
                 <div class="about-text">
                     <h3>Hello！我是孙靖淞</h3>
@@ -710,44 +875,6 @@
         </div>
     </section>
 
-    <!-- 联系方式 -->
-    <section class="contact" id="contact">
-        <div class="container">
-            <h2 class="section-title">联系方式</h2>
-            <div class="contact-content">
-                <div class="contact-card card">
-                    <div class="contact-icon">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <h3>邮箱</h3>
-                    <p>jssun517@outlook.com</p>
-                    <p>随时欢迎与我联系，讨论技术合作或职业机会。</p>
-                </div>
-                <div class="contact-card card">
-                    <div class="contact-icon">
-                        <i class="fas fa-phone"></i>
-                    </div>
-                    <h3>电话</h3>
-                    <p>+86 17746575178</p>
-                    <p>工作时间内可接听电话，其他时间请留言或添加微信。</p>
-                </div>
-                <div class="contact-card card">
-                    <div class="contact-icon">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </div>
-                    <h3>地址</h3>
-                    <p>北京市朝阳区朝阳区西坝河东里2号院</p>
-                </div>
-            </div>
-            <div class="social-links">
-                <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                <a href="https://m.zhipin.com/mpa/html/resume-detail?sid=self&securityId=OxSrj6zeuJEDF-414PDtkx8a8R5XlTYDPWUoBOWYTuym6XxbuxM-jiRK3Aop3jcaoYW9ArwcFzAmIu0qvY9XbIFghrXCevw4pI9AvJ-UDcTCPBhH7WmLpBWkHvVoZ80TWKYcUyB25pxQ5DOfY3b0n5BOndqpb5dlsaq5KrI~" title="Boss直聘" target="_blank" class="boss-link"><img src="boss-icon.png" alt="Boss直聘" class="boss-icon"></a>
-                <a href="javascript:void(0);" title="微信" id="wechatLink"><i class="fab fa-weixin"></i></a>
-               <!-- <a href="#" title="知乎"><i class="fab fa-zhihu"></i></a>
-                <a href="#" title="ResearchGate"><i class="fab fa-researchgate"></i></a>-->
-            </div>
-        </div>
-    </section>
 
     <!-- 履历 -->
     <section class="resume" id="resume">
@@ -757,7 +884,7 @@
                 <div class="timeline-item">
                     <div class="timeline-content card">
                         <h3>反无人机系统研发工程师</h3>
-                        <span class="date">2024.07 - 2024.12</span>
+                        <span class="date">2025.12 - 当前</span>
                         <p>北京羽嘉科技有限公司</p>
                         <p>参与反无人机设备以及系统的硬件设计和信号处理算法优化，将探测距离从15km。负责系统集成测试，编写技术文档。</p>
                     </div>
@@ -765,26 +892,26 @@
                 <div class="timeline-item">
                     <div class="timeline-content card">
                         <h3>电子电气工程学士</h3>
-                        <span class="date">2023.09 - 2025.06（预计）</span>
+                        <span class="date">2021.10 - 2025.09</span>
                         <p>南安普顿大学电子电气工程专业</p>
-                        <p>研究方向：GPA：3.8/4.0。毕业论文：《基于深度学习的无人机射频指纹识别技术研究》。</p>
+                        <p>待补充</p>
                     </div>
                 </div>
                 <div class="timeline-item">
                     <div class="timeline-content card">
-                        <h3>反无人机系统测试工程师（实习）</h3>
-                        <span class="date">2023.03 - 2023.08</span>
-                        <p>上海安防科技集团</p>
-                        <p>负责反无人机系统的现场测试与性能评估，撰写测试报告，提出产品改进建议。参与三个大型活动的低空安全保障任务。</p>
+                        <h3>车辆系统工程师（实习）</h3>
+                        <span class="date">2023.05 - 2023.08</span>
+                        <p>待补充</p>
+                        <p>待补充</p>
                     </div>
-                </div>
+               <!--</div>
                 <div class="timeline-item">
                     <div class="timeline-content card">
                         <h3>电子信息工程学士</h3>
                         <span class="date">2019.09 - 2023.06</span>
                         <p">哈尔滨工业大学</p>
                         <p>主修电子信息工程，辅修计算机科学。毕业设计：《基于软件无线电的无人机信号监测系统》。获得校级优秀毕业生称号。</p>
-                    </div>
+                    </div>  --> 
                 </div>
             </div>
         </div>
@@ -841,6 +968,45 @@
         </div>
     </section>
 
+    <!-- 联系方式 -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <h2 class="section-title">联系方式</h2>
+            <div class="contact-content">
+                <div class="contact-card card">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3>邮箱</h3>
+                    <p>jssun517@outlook.com</p>
+                    <p>随时欢迎与我联系，讨论技术合作或职业机会。</p>
+                </div>
+                <div class="contact-card card">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h3>电话</h3>
+                    <p>+86 17746575178</p>
+                    <p>工作时间内可接听电话，其他时间请留言或添加微信。</p>
+                </div>
+                <div class="contact-card card">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3>地址</h3>
+                    <p>北京市朝阳区朝阳区西坝河东里2号院</p>
+                </div>
+            </div>
+            <div class="social-links">
+                <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://m.zhipin.com/mpa/html/resume-detail?sid=self&securityId=OxSrj6zeuJEDF-414PDtkx8a8R5XlTYDPWUoBOWYTuym6XxbuxM-jiRK3Aop3jcaoYW9ArwcFzAmIu0qvY9XbIFghrXCevw4pI9AvJ-UDcTCPBhH7WmLpBWkHvVoZ80TWKYcUyB25pxQ5DOfY3b0n5BOndqpb5dlsaq5KrI~" title="Boss直聘" target="_blank" class="boss-link"><img src="boss-icon.png" alt="Boss直聘" class="boss-icon"></a>
+                <a href="javascript:void(0);" title="微信" id="wechatLink"><i class="fab fa-weixin"></i></a>
+               <!-- <a href="#" title="知乎"><i class="fab fa-zhihu"></i></a>
+                <a href="#" title="ResearchGate"><i class="fab fa-researchgate"></i></a>-->
+            </div>
+        </div>
+    </section>
+
     <!-- 页脚 -->
     <footer>
         <div class="container">
@@ -854,7 +1020,6 @@
             </div>
             <div class="copyright">
                 <p>&copy; 2025 孙靖淞 - 反无人机设备产品研发工程师. 保留所有权利.</p>
-                <p>本页面仅为展示用途，联系方式为示例。</p>
             </div>
         </div>
     </footer>
@@ -887,6 +1052,7 @@
             });
         });
 
+
         // 滚动时添加导航栏阴影
         window.addEventListener('scroll', () => {
             const header = document.querySelector('header');
@@ -901,36 +1067,370 @@
     <script>
         // 微信二维码模态框
         const wechatLink = document.getElementById('wechatLink');
+        const wechatLinkNav = document.getElementById('wechatLinkNav');
         const wechatModal = document.getElementById('wechatModal');
         const modalClose = document.getElementById('modalClose');
 
-        if (wechatLink && wechatModal) {
-            wechatLink.addEventListener('click', () => {
-                wechatModal.classList.add('active');
-                document.body.style.overflow = 'hidden'; // 防止背景滚动
-            });
+        function openWechatModal() {
+            wechatModal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // 防止背景滚动
+        }
 
-            modalClose.addEventListener('click', () => {
-                wechatModal.classList.remove('active');
-                document.body.style.overflow = '';
-            });
+        function closeWechatModal() {
+            wechatModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (wechatModal) {
+            // 为页面底部的微信链接添加事件
+            if (wechatLink) {
+                wechatLink.addEventListener('click', openWechatModal);
+            }
+
+            // 为导航栏下拉菜单中的微信链接添加事件
+            if (wechatLinkNav) {
+                wechatLinkNav.addEventListener('click', openWechatModal);
+            }
+
+            modalClose.addEventListener('click', closeWechatModal);
 
             // 点击模态框背景关闭
             wechatModal.addEventListener('click', (e) => {
                 if (e.target === wechatModal) {
-                    wechatModal.classList.remove('active');
-                    document.body.style.overflow = '';
+                    closeWechatModal();
                 }
             });
 
             // ESC键关闭
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && wechatModal.classList.contains('active')) {
-                    wechatModal.classList.remove('active');
-                    document.body.style.overflow = '';
+                    closeWechatModal();
                 }
             });
         }
+
+        // 自我介绍照片轮播
+        const carousel = document.getElementById('aboutCarousel');
+        if (carousel) {
+            const slides = carousel.querySelectorAll('.carousel-slide');
+            const prevBtn = carousel.querySelector('.carousel-btn.prev');
+            const nextBtn = carousel.querySelector('.carousel-btn.next');
+            const indicators = carousel.querySelectorAll('.carousel-indicator');
+
+            let currentIndex = 0;
+            const totalSlides = slides.length;
+
+            // 更新轮播状态
+            function updateCarousel() {
+                slides.forEach((slide, index) => {
+                    slide.classList.toggle('active', index === currentIndex);
+                });
+
+                indicators.forEach((indicator, index) => {
+                    indicator.classList.toggle('active', index === currentIndex);
+                });
+            }
+
+            // 下一张
+            function nextSlide() {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateCarousel();
+            }
+
+            // 上一张
+            function prevSlide() {
+                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                updateCarousel();
+            }
+
+            // 跳转到指定索引
+            function goToSlide(index) {
+                currentIndex = index;
+                updateCarousel();
+            }
+
+            // 事件监听
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', () => goToSlide(index));
+            });
+
+            // 自动轮播（可选，每5秒自动切换）
+            let autoSlideInterval = setInterval(nextSlide,3000);
+
+            // 鼠标悬停时暂停自动轮播
+            carousel.addEventListener('mouseenter', () => {
+                clearInterval(autoSlideInterval);
+            });
+
+            carousel.addEventListener('mouseleave', () => {
+                autoSlideInterval = setInterval(nextSlide, 5000);
+            });
+        }
     </script>
+
+    <script>
+        // 语言切换功能
+        const langToggle = document.getElementById('langToggle');
+        let currentLang = 'zh'; // 默认中文
+
+        // 翻译映射
+        const translations = {
+            zh: {
+                // 导航
+                'nav.home': '首页',
+                'nav.about': '关于我',
+                'nav.resume': '履历',
+                'nav.projects': '项目',
+                'nav.contact': '联系',
+                // 英雄区域
+                'hero.title': 'Anti-UAV <span>产品研发工程师</span>',
+                'hero.subtitle': '专注于反无人机系统设计、信号处理与嵌入式开发',
+                'hero.cta': '了解更多',
+                // 关于我
+                'about.title': '自我介绍',
+                'about.hello': 'Hello！我是孙靖淞',
+                'about.p1': '一名2025年毕业于英国南安普顿大学的反无人机设备产品研发工程师，专注于设计、开发和优化反无人机系统，以应对日益增长的无人机威胁。我对射频信号处理、嵌入式系统和机器学习在无人机探测与反制中的应用充满热情。',
+                'about.p2': '在校期间，我主修电子电气工程专业（EEE），并在多家公司实习，积累了丰富的实战经验。我坚信技术创新是产品研发的关键，致力于提供高效、可靠的项目解决方案。',
+                'about.p3': '我的目标是成为一名顶尖的反无人机系统架构师，为关键基础设施、大型活动和个人隐私提供全面的低空安全防护。',
+                // 技能
+                'skill.1': '射频信号处理',
+                'skill.2': '嵌入式系统开发',
+                'skill.3': '无人机探测技术',
+                'skill.4': '机器学习算法',
+                'skill.5': '硬件设计',
+                'skill.6': '算法',
+                'skill.7': 'C语言编程',
+                'skill.8': '项目管理和团队协作',
+                'skill.9': '控制系统',
+                'skill.10': '数电模电',
+                'skill.11': '集成电路设计与开发',
+                // 履历
+                'resume.title': '工作与教育履历',
+                'resume.job1.title': '反无人机系统研发工程师',
+                'resume.job1.date': '2025.12 - 当前',
+                'resume.job1.company': '北京羽嘉科技有限公司',
+                'resume.job1.desc1': '参与反无人机设备以及系统的硬件设计和信号处理算法优化，将探测距离从15km。负责系统集成测试，编写技术文档。',
+                'resume.job1.desc2': '',
+                'resume.edu1.title': '电子电气工程学士',
+                'resume.edu1.date': '2021.10 - 2025.09',
+                'resume.edu1.school': '南安普顿大学电子电气工程专业',
+                'resume.edu1.desc': '待补充',
+                'resume.intern.title': '车辆系统工程师（实习）',
+                'resume.intern.date': '2023.05 - 2023.08',
+                'resume.intern.company': '待补充',
+                'resume.intern.desc': '待补充',
+                // 项目
+                'projects.title': '项目经历',
+                'project1.title': '便携式反无人机干扰器',
+                'project1.desc': '设计并开发一款手持式反无人机干扰设备，集成多种干扰模式，有效作用距离达1.5公里。项目已成功应用于多个大型活动的安保工作。',
+                'project1.tag1': '嵌入式系统',
+                'project1.tag2': '射频工程',
+                'project1.tag3': '硬件设计',
+                'project2.title': '基于深度学习的无人机探测系统',
+                'project2.desc': '开发了一套利用卷积神经网络识别无人机射频指纹的系统，识别准确率达到94.7%。该系统可区分不同品牌和型号的无人机。',
+                'project2.tag1': '机器学习',
+                'project2.tag2': 'Python',
+                'project2.tag3': '信号处理',
+                'project3.title': '固定式区域反无人机系统',
+                'project3.desc': '参与设计用于机场和核电站等关键基础设施的固定式反无人机系统。负责信号处理模块和系统集成，实现360度全向防护。',
+                'project3.tag1': '系统集成',
+                'project3.tag2': 'C++',
+                'project3.tag3': '项目管理',
+                // 联系方式
+                'contact.title': '联系方式',
+                'contact.email.title': '邮箱',
+                'contact.email.desc': '随时欢迎与我联系，讨论技术合作或职业机会。',
+                'contact.phone.title': '电话',
+                'contact.phone.desc': '工作时间内可接听电话，其他时间请留言或添加微信。',
+                'contact.address.title': '地址',
+                'contact.address.desc': '',
+                // 页脚
+                'footer.motto1': '专注于反无人机技术研发与创新',
+                'footer.motto2': '保障低空空域安全，构建智慧安防体系',
+                'footer.backToTop': '回到顶部',
+                'footer.copyright': '© 2025 孙靖淞 - 反无人机设备产品研发工程师. 保留所有权利.'
+            },
+            en: {
+                // 导航
+                'nav.home': 'Home',
+                'nav.about': 'About Me',
+                'nav.resume': 'Resume',
+                'nav.projects': 'Projects',
+                'nav.contact': 'Contact',
+                // 英雄区域
+                'hero.title': 'Anti-UAV <span>Product R&D Engineer</span>',
+                'hero.subtitle': 'Specializing in anti-UAV system design, signal processing and embedded development',
+                'hero.cta': 'Learn More',
+                // 关于我
+                'about.title': 'About Me',
+                'about.hello': 'Hello! I am Sun Jingsong',
+                'about.p1': 'A 2025 graduate from the University of Southampton, focusing on designing, developing and optimizing anti-UAV systems to address the growing threat of drones. I am passionate about RF signal processing, embedded systems and machine learning applications in UAV detection and countermeasures.',
+                'about.p2': 'During my studies, I majored in Electronic and Electrical Engineering (EEE) and interned at several companies, gaining extensive hands-on experience. I believe technological innovation is key to product development and am committed to delivering efficient and reliable project solutions.',
+                'about.p3': 'My goal is to become a top anti-UAV system architect, providing comprehensive low-altitude security protection for critical infrastructure, large-scale events and personal privacy.',
+                // 技能
+                'skill.1': 'RF Signal Processing',
+                'skill.2': 'Embedded Systems Development',
+                'skill.3': 'UAV Detection Technology',
+                'skill.4': 'Machine Learning Algorithms',
+                'skill.5': 'Hardware Design',
+                'skill.6': 'Algorithm',
+                'skill.7': 'C Coding',
+                'skill.8': 'Project Management & Team Collaboration',
+                'skill.9': 'Control Systems',
+                'skill.10': 'Digital & Analog Electronics',
+                'skill.11': 'IC Design & Development',
+                // 履历
+                'resume.title': 'Work & Education',
+                'resume.job1.title': 'Anti-UAV System R&D Engineer',
+                'resume.job1.date': 'Dec 2025 - Present',
+                'resume.job1.company': 'Beijing Yujia Technology Co., Ltd.',
+                'resume.job1.desc1': 'Participated in hardware design and signal processing algorithm optimization for anti-UAV equipment and systems, increasing detection range from 15km. Responsible for system integration testing and technical documentation.',
+                'resume.job1.desc2': '',
+                'resume.edu1.title': 'Bachelor of Electronic and Electrical Engineering',
+                'resume.edu1.date': 'Oct 2021 - Sep 2025',
+                'resume.edu1.school': 'University of Southampton, Electronic and Electrical Engineering',
+                'resume.edu1.desc': 'To be added',
+                'resume.intern.title': 'Vehicle Systems Engineer (Intern)',
+                'resume.intern.date': 'May 2023 - Aug 2023',
+                'resume.intern.company': 'To be added',
+                'resume.intern.desc': 'To be added',
+                // 项目
+                'projects.title': 'Project Experience',
+                'project1.title': 'Portable Anti-UAV Jammer',
+                'project1.desc': 'Designed and developed a handheld anti-UAV jamming device with multiple interference modes, effective range up to 1.5 km. Successfully deployed for security at multiple large-scale events.',
+                'project1.tag1': 'Embedded Systems',
+                'project1.tag2': 'RF Engineering',
+                'project1.tag3': 'Hardware Design',
+                'project2.title': 'Deep Learning-based UAV Detection System',
+                'project2.desc': 'Developed a system using convolutional neural networks to identify UAV RF fingerprints with 94.7% accuracy. The system can distinguish between different brands and models of drones.',
+                'project2.tag1': 'Machine Learning',
+                'project2.tag2': 'Python',
+                'project2.tag3': 'Signal Processing',
+                'project3.title': 'Fixed-site Area Anti-UAV System',
+                'project3.desc': 'Participated in designing a fixed anti-UAV system for critical infrastructure such as airports and nuclear power plants. Responsible for signal processing module and system integration, achieving 360-degree omnidirectional protection.',
+                'project3.tag1': 'System Integration',
+                'project3.tag2': 'C++',
+                'project3.tag3': 'Project Management',
+                // 联系方式
+                'contact.title': 'Contact',
+                'contact.email.title': 'Email',
+                'contact.email.desc': 'Feel free to contact me to discuss technical collaboration or career opportunities.',
+                'contact.phone.title': 'Phone',
+                'contact.phone.desc': 'Available during business hours, please leave a message or add WeChat at other times.',
+                'contact.address.title': 'Address',
+                'contact.address.desc': '',
+                // 页脚
+                'footer.motto1': 'Focusing on anti-UAV technology R&D and innovation',
+                'footer.motto2': 'Ensuring low-altitude airspace security, building intelligent security systems',
+                'footer.backToTop': 'Back to Top',
+                'footer.copyright': '© 2025 Sun Jingsong - Anti-UAV Product R&D Engineer. All rights reserved.'
+            }
+        };
+
+        // 元素映射
+        const elements = {
+            'nav.home': document.querySelector('.nav-links a[href="#home"]'),
+            'nav.about': document.querySelector('.nav-links a[href="#about"]'),
+            'nav.resume': document.querySelector('.nav-links a[href="#resume"]'),
+            'nav.projects': document.querySelector('.nav-links a[href="#projects"]'),
+            'nav.contact': document.querySelector('.nav-links a[href="#contact"]'),
+            'hero.title': document.querySelector('.hero h1'),
+            'hero.subtitle': document.querySelector('.hero p'),
+            'hero.cta': document.querySelector('.hero .cta-button'),
+            'about.title': document.querySelector('#about .section-title'),
+            'about.hello': document.querySelector('.about-text h3'),
+            'about.p1': document.querySelectorAll('.about-text p')[0],
+            'about.p2': document.querySelectorAll('.about-text p')[1],
+            'about.p3': document.querySelectorAll('.about-text p')[2],
+            'resume.title': document.querySelector('#resume .section-title'),
+            'resume.job1.title': document.querySelectorAll('.timeline-content h3')[0],
+            'resume.job1.date': document.querySelectorAll('.timeline-content .date')[0],
+            'resume.job1.company': document.querySelectorAll('.timeline-content p')[0],
+            'resume.job1.desc1': document.querySelectorAll('.timeline-content p')[1],
+            'resume.edu1.title': document.querySelectorAll('.timeline-content h3')[1],
+            'resume.edu1.date': document.querySelectorAll('.timeline-content .date')[1],
+            'resume.edu1.school': document.querySelectorAll('.timeline-content p')[2],
+            'resume.edu1.desc': document.querySelectorAll('.timeline-content p')[3],
+            'resume.intern.title': document.querySelectorAll('.timeline-content h3')[2],
+            'resume.intern.date': document.querySelectorAll('.timeline-content .date')[2],
+            'resume.intern.company': document.querySelectorAll('.timeline-content p')[4],
+            'resume.intern.desc': document.querySelectorAll('.timeline-content p')[5],
+            'projects.title': document.querySelector('#projects .section-title'),
+            'project1.title': document.querySelectorAll('.project-info h3')[0],
+            'project1.desc': document.querySelectorAll('.project-info p')[0],
+            'project1.tag1': document.querySelectorAll('.project-tag')[0],
+            'project1.tag2': document.querySelectorAll('.project-tag')[1],
+            'project1.tag3': document.querySelectorAll('.project-tag')[2],
+            'project2.title': document.querySelectorAll('.project-info h3')[1],
+            'project2.desc': document.querySelectorAll('.project-info p')[1],
+            'project2.tag1': document.querySelectorAll('.project-tag')[3],
+            'project2.tag2': document.querySelectorAll('.project-tag')[4],
+            'project2.tag3': document.querySelectorAll('.project-tag')[5],
+            'project3.title': document.querySelectorAll('.project-info h3')[2],
+            'project3.desc': document.querySelectorAll('.project-info p')[2],
+            'project3.tag1': document.querySelectorAll('.project-tag')[6],
+            'project3.tag2': document.querySelectorAll('.project-tag')[7],
+            'project3.tag3': document.querySelectorAll('.project-tag')[8],
+            // 技能
+            'skill.1': document.querySelectorAll('.skill-tag')[0],
+            'skill.2': document.querySelectorAll('.skill-tag')[1],
+            'skill.3': document.querySelectorAll('.skill-tag')[2],
+            'skill.4': document.querySelectorAll('.skill-tag')[3],
+            'skill.5': document.querySelectorAll('.skill-tag')[4],
+            'skill.6': document.querySelectorAll('.skill-tag')[5],
+            'skill.7': document.querySelectorAll('.skill-tag')[6],
+            'skill.8': document.querySelectorAll('.skill-tag')[7],
+            'skill.9': document.querySelectorAll('.skill-tag')[8],
+            'skill.10': document.querySelectorAll('.skill-tag')[9],
+            'skill.11': document.querySelectorAll('.skill-tag')[10],
+            'contact.title': document.querySelector('#contact .section-title'),
+            'contact.email.title': document.querySelectorAll('.contact-card h3')[0],
+            'contact.email.desc': document.querySelectorAll('.contact-card p')[1],
+            'contact.phone.title': document.querySelectorAll('.contact-card h3')[1],
+            'contact.phone.desc': document.querySelectorAll('.contact-card p')[3],
+            'contact.address.title': document.querySelectorAll('.contact-card h3')[2],
+            'contact.address.desc': document.querySelectorAll('.contact-card p')[4],
+            'footer.motto1': document.querySelectorAll('footer p')[0],
+            'footer.motto2': document.querySelectorAll('footer p')[1],
+            'footer.backToTop': document.querySelector('footer .cta-button'),
+            'footer.copyright': document.querySelector('.copyright p')
+        };
+
+        // 更新页面文本
+        function updatePageText(lang) {
+            Object.keys(elements).forEach(key => {
+                const element = elements[key];
+                if (element && translations[lang][key]) {
+                    if (key === 'hero.title') {
+                        // 特殊处理包含HTML的情况
+                        element.innerHTML = translations[lang][key];
+                    } else {
+                        element.textContent = translations[lang][key];
+                    }
+                }
+            });
+        }
+
+        // 切换语言
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            // 更新按钮文本
+            langToggle.textContent = currentLang === 'zh' ? 'EN' : '中文';
+            // 更新页面文本
+            updatePageText(currentLang);
+        }
+
+        // 初始化事件
+        if (langToggle) {
+            langToggle.addEventListener('click', toggleLanguage);
+        }
+
+        // 页面加载时初始化中文文本（脚本在body末尾，DOM已加载）
+        updatePageText('zh');
+    </script>
+
 </body>
 </html>
